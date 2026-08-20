@@ -9,22 +9,22 @@
     header { background:#000; padding:60px 20px; text-align:center; border-bottom:3px solid #FFD700; }
     header img { width:130px; margin-bottom:20px; border-radius:20px; }
     h1 { color:#FFD700; font-size:48px; }
-  .container { max-width:950px; margin:0 auto; padding:50px 20px; text-align:center; }
-  .btn { background:#FFD700; color:#000; padding:16px 35px; border-radius:10px; text-decoration:none; font-weight:bold; margin:10px; display:inline-block; }
-  .section { margin:50px 0; text-align:left; }
-  .section h2 { color:#FFD700; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px; }
-  .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; }
-  .gallery img { width:100%; border-radius:12px; border:2px solid #222; }
-  .editable[contenteditable="true"] { outline:2px dashed #FFD700; padding:5px; }
-    
+ .container { max-width:950px; margin:0 auto; padding:50px 20px; text-align:center; }
+ .btn { background:#FFD700; color:#000; padding:16px 35px; border-radius:10px; text-decoration:none; font-weight:bold; margin:10px; display:inline-block; }
+ .section { margin:50px 0; text-align:left; }
+ .section h2 { color:#FFD700; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px; }
+ .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; }
+ .gallery img { width:100%; border-radius:12px; border:2px solid #222; }
+ .editable[contenteditable="true"] { outline:2px dashed #FFD700; padding:5px; }
+
     /* ADMIN PANEL - HIDDEN BY DEFAULT */
     #adminPanel { display:none; position:fixed; top:0; right:-400px; width:380px; height:100%; background:#111; border-left:3px solid #FFD700; padding:20px; transition:0.3s; overflow-y:auto; z-index:999; }
     #adminPanel.open { right:0; display:block; }
     #adminBtn { display:none; position:fixed; top:20px; right:20px; background:red; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; z-index:1000; font-weight:bold; }
     #adminPanel input, #adminPanel textarea { width:100%; padding:10px; margin:8px 0; background:#222; color:#fff; border:1px solid #444; border-radius:5px; }
     #adminPanel button { background:#FFD700; color:#000; padding:10px; border:none; border-radius:5px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px; }
-  .screenshot-item { background:#222; padding:10px; border-radius:8px; margin:10px 0; }
-  .removeBtn { background:#ff3333!important; color:white!important; }
+ .screenshot-item { background:#222; padding:10px; border-radius:8px; margin:10px 0; }
+ .removeBtn { background:#ff3333!important; color:white!important; }
   </style>
 </head>
 <body>
@@ -38,26 +38,20 @@
     <input type="password" id="adminCode" placeholder="Enter password">
     <button onclick="login()">Login</button>
   </div>
-  
+
   <div id="editBox" style="display:none">
     <h3>Edit Site</h3>
-    <label>Title</label>
-    <input type="text" id="editTitle">
-    <label>Tagline</label>
-    <input type="text" id="editTagline">
-    <label>Logo Upload</label>
-    <input type="file" id="logoUpload" accept="image/*" onchange="uploadImage(event, 'logo')">
-    <label>Download Link</label>
-    <input type="text" id="editDownload">
-    <label>GitHub Link</label>
-    <input type="text" id="editGithub">
-    <label>About Text</label>
-    <textarea id="editAbout" rows="4"></textarea>
-    
+    <label>Title</label><input type="text" id="editTitle">
+    <label>Tagline</label><input type="text" id="editTagline">
+    <label>Logo Upload</label><input type="file" id="logoUpload" accept="image/*" onchange="uploadImage(event, 'logo')">
+    <label>Download Link</label><input type="text" id="editDownload">
+    <label>GitHub Link</label><input type="text" id="editGithub">
+    <label>About Text</label><textarea id="editAbout" rows="4"></textarea>
+
     <h3 style="color:#FFD700;margin-top:20px">Screenshots</h3>
     <div id="screenshotsList"></div>
     <button onclick="addScreenshotField()">+ Add Another Screenshot</button>
-    
+
     <button onclick="saveChanges()">Save Changes</button>
     <button onclick="exportCode()" style="background:#00ff00">Save & Export Code</button>
     <button onclick="logout()" style="background:#555">Logout</button>
@@ -90,20 +84,18 @@
 <footer style="text-align:center;padding:25px;background:#000;color:#777">© 2026 Amphiptere OS</footer>
 
 <script>
-// SECURITY: Password is hashed. Real password: amphiptere123
-// To change password: go to https://emn178.github.io/online-tools/sha256.html and hash your new password
-const ADMIN_HASH = "b3a1f4b5c8d2e9a0f1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4"; // hash of amphiptere123
+// YOUR SECURE PASSWORD HASH
+const ADMIN_HASH = "c85a63d08d50d40140f9b3dad018399be8a8f8071d48f1d618fb9f286ef65792";
 
 let screenshots = [];
 
-// STEP 1: SHOW ADMIN BUTTON ONLY IF URL HAS?admin=true
+// SHOW ADMIN BUTTON ONLY IF URL HAS?admin=true
 window.onload = function() {
   const urlParams = new URLSearchParams(window.location.search);
   if(urlParams.get('admin') === 'true') {
     document.getElementById('adminBtn').style.display = 'block';
   }
-  
-  // Load saved data
+
   let data = JSON.parse(localStorage.getItem('amphiptereData'));
   if(data) {
     document.getElementById('title').innerText = data.title;
@@ -128,13 +120,10 @@ async function sha256(message) {
 async function login() {
   const inputPass = document.getElementById('adminCode').value;
   const inputHash = await sha256(inputPass);
-  
   if(inputHash === ADMIN_HASH) {
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('editBox').style.display = 'block';
-    enableEdit();
-    loadToForm();
-    renderScreenshotFields();
+    enableEdit(); loadToForm(); renderScreenshotFields();
   } else { alert("Wrong code!"); }
 }
 
@@ -152,11 +141,10 @@ function loadToForm() {
 }
 
 // SCREENSHOT FUNCTIONS
-function addScreenshotField(imgSrc = "") { screenshots.push(imgSrc); renderScreenshotFields(); }
+function addScreenshotField() { screenshots.push(""); renderScreenshotFields(); }
 function removeScreenshotField(index) { screenshots.splice(index, 1); renderScreenshotFields(); renderGallery(); }
 function uploadScreenshot(event, index) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
+  const file = event.target.files[0]; const reader = new FileReader();
   reader.onload = function(e) { screenshots[index] = e.target.result; renderGallery(); }
   reader.readAsDataURL(file);
 }
@@ -168,14 +156,12 @@ function renderScreenshotFields() {
   document.getElementById('screenshotsList').innerHTML = html;
 }
 function renderGallery() {
-  let html = "";
-  screenshots.forEach(src => { if(src) html += `<img src="${src}">`; });
+  let html = ""; screenshots.forEach(src => { if(src) html += `<img src="${src}">`; });
   document.getElementById('gallery').innerHTML = html;
 }
 
 function uploadImage(event, id) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
+  const file = event.target.files[0]; const reader = new FileReader();
   reader.onload = function(e) { document.getElementById(id).src = e.target.result; }
   reader.readAsDataURL(file);
 }
@@ -191,8 +177,7 @@ function saveChanges() {
     screenshots: screenshots
   };
   localStorage.setItem('amphiptereData', JSON.stringify(data));
-  location.reload();
-  alert("Saved on this device!");
+  location.reload(); alert("Saved on this device!");
 }
 
 function exportCode() {
