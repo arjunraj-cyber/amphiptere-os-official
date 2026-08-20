@@ -13,7 +13,8 @@
    .btn { background:#FFD700; color:#000; padding:16px 35px; border-radius:10px; text-decoration:none; font-weight:bold; margin:10px; display:inline-block; }
    .section { margin:50px 0; text-align:left; }
    .section h2 { color:#FFD700; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px; }
-   .section img { max-width:100%; border-radius:12px; margin:20px 0; border:2px solid #222; }
+   .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; }
+   .gallery img { width:100%; border-radius:12px; border:2px solid #222; }
    .editable[contenteditable="true"] { outline:2px dashed #FFD700; padding:5px; }
     
     /* ADMIN PANEL */
@@ -23,6 +24,8 @@
     #adminPanel input, #adminPanel textarea { width:100%; padding:10px; margin:8px 0; background:#222; color:#fff; border:1px solid #444; border-radius:5px; }
     #adminPanel button { background:#FFD700; color:#000; padding:10px; border:none; border-radius:5px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px; }
     #adminPanel label { font-size:14px; color:#aaa; }
+   .screenshot-item { background:#222; padding:10px; border-radius:8px; margin:10px 0; }
+   .removeBtn { background:#ff3333!important; color:white!important; margin-top:5px; }
   </style>
 </head>
 <body>
@@ -57,8 +60,9 @@
     <label>About Text</label>
     <textarea id="editAbout" rows="4"></textarea>
     
-    <label>Screenshot Upload</label>
-    <input type="file" id="screenshotUpload" accept="image/*" onchange="uploadImage(event, 'screenshot1')">
+    <h3 style="color:#FFD700;margin-top:20px">Screenshots</h3>
+    <div id="screenshotsList"></div>
+    <button onclick="addScreenshotField()">+ Add Another Screenshot</button>
     
     <button onclick="saveChanges()">Save Changes</button>
     <button onclick="exportCode()" style="background:#00ff00">Save & Export Code</button>
@@ -85,14 +89,15 @@
 
   <div class="section">
     <h2>Screenshots</h2>
-    <img id="screenshot1" src="screenshot1.png">
+    <div id="gallery" class="gallery"></div>
   </div>
 </div>
 
 <footer style="text-align:center;padding:25px;background:#000;color:#777">© 2026 Amphiptere OS</footer>
 
 <script>
-const ADMIN_PASSWORD = "amphiptere123"; // CHANGE THIS
+const ADMIN_PASSWORD = "amphiptere123";
+let screenshots = [];
 
 // LOAD SAVED DATA
 window.onload = function() {
@@ -104,7 +109,8 @@ window.onload = function() {
     document.getElementById('downloadBtn').href = data.download;
     document.getElementById('githubBtn').href = data.github;
     if(data.logo) document.getElementById('logo').src = data.logo;
-    if(data.screenshot) document.getElementById('screenshot1').src = data.screenshot;
+    screenshots = data.screenshots || [];
+    renderGallery();
   }
 }
 
@@ -116,6 +122,7 @@ function login() {
     document.getElementById('editBox').style.display = 'block';
     enableEdit();
     loadToForm();
+    renderScreenshotFields();
   } else { alert("Wrong code!"); }
 }
 
@@ -135,7 +142,50 @@ function loadToForm() {
   document.getElementById('editGithub').value = document.getElementById('githubBtn').href;
 }
 
-// NEW: UPLOAD IMAGE FUNCTION
+// SCREENSHOT FUNCTIONS
+function addScreenshotField(imgSrc = "") {
+  screenshots.push(imgSrc);
+  renderScreenshotFields();
+}
+
+function removeScreenshotField(index) {
+  screenshots.splice(index, 1);
+  renderScreenshotFields();
+  renderGallery();
+}
+
+function uploadScreenshot(event, index) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    screenshots[index] = e.target.result;
+    renderGallery();
+  }
+  reader.readAsDataURL(file);
+}
+
+function renderScreenshotFields() {
+  let html = "";
+  screenshots.forEach((src, i) => {
+    html += `
+      <div class="screenshot-item">
+        <label>Screenshot ${i+1}</label>
+        <input type="file" accept="image/*" onchange="uploadScreenshot(event, ${i})">
+        <button class="removeBtn" onclick="removeScreenshotField(${i})">Remove</button>
+      </div>
+    `;
+  });
+  document.getElementById('screenshotsList').innerHTML = html;
+}
+
+function renderGallery() {
+  let html = "";
+  screenshots.forEach(src => {
+    if(src) html += `<img src="${src}">`;
+  });
+  document.getElementById('gallery').innerHTML = html;
+}
+
 function uploadImage(event, id) {
   const file = event.target.files[0];
   const reader = new FileReader();
@@ -153,7 +203,7 @@ function saveChanges() {
     download: document.getElementById('editDownload').value,
     github: document.getElementById('editGithub').value,
     logo: document.getElementById('logo').src,
-    screenshot: document.getElementById('screenshot1').src
+    screenshots: screenshots
   };
   localStorage.setItem('amphiptereData', JSON.stringify(data));
   location.reload();
@@ -162,7 +212,7 @@ function saveChanges() {
 
 function exportCode() {
   let html = document.documentElement.outerHTML;
-  prompt("Copy this entire code and paste it in GitHub index.html to make it public:", html);
+  prompt("Copy this entire code and paste it in GitHub index.html:", html);
 }
 </script>
 
