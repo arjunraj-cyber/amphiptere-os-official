@@ -25,8 +25,8 @@
     #adminPanel input, #adminPanel textarea { width:100%; padding:10px; margin:8px 0; background:#222; color:#fff; border:1px solid #444; border-radius:5px; }
     #adminPanel label { display:block; margin-top:10px; color:#FFD700; font-weight:bold; }
     #adminPanel button { background:#FFD700; color:#000; padding:10px; border:none; border-radius:5px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px; }
-  .screenshot-item { background:#222; padding:10px; border-radius:8px; margin:10px 0; }
-  .removeBtn { background:#ff3333!important; color:white!important; }
+ .screenshot-item { background:#222; padding:10px; border-radius:8px; margin:10px 0; }
+ .removeBtn { background:#ff3333!important; color:white!important; }
     footer { text-align:center; padding:25px; background:#000; color:#777; border-top:1px solid #222; }
   </style>
 </head>
@@ -53,7 +53,6 @@
     <div id="screenshotsList"></div>
     <button onclick="addScreenshotField()">+ Add Another Screenshot</button>
     <button onclick="saveChanges()">Save Changes</button>
-    <button onclick="downloadCode()" style="background:#00ff00">Download Full Code</button>
     <button onclick="logout()" style="background:#555">Logout</button>
   </div>
 </div>
@@ -170,17 +169,6 @@ function saveChanges() {
   };
   localStorage.setItem('amphiptereData', JSON.stringify(data));
   location.reload(); alert("Saved on this device!");
-}
-
-// NEW: Downloads file instead of broken popup
-function downloadCode() {
-  let html = document.documentElement.outerHTML;
-  let blob = new Blob([html], {type: 'text/html'});
-  let a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'index.html';
-  a.click();
-  alert("Downloaded! Now upload this file to GitHub");
 }
 </script>
 
